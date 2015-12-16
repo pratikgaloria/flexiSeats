@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>flexiSeats</title>
+    <link href="styles/flexilayout.css" rel="stylesheet" />
+    <link href="styles/font-awesome.min.css" rel="stylesheet" />
+    <script src="scripts/jquery-2.1.4.min.js"></script>
+    <script src="scripts/flexilayout.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {            
+            var seats = $('#seats').flexiSeats({
+                rows: 10,
+                columns: 20,
+                multiple: false,
+                notavailable: ['1-2', '4-3'],
+                booked: ['2-3']
+            });
+
+            $('#btnGetSelected').click(function () {
+                seats.getSelected();
+            });            
+        });
+    </script>
+    
+</head>
+<body>
+
+    <div class="legends">
+        <input id="legAvailable" type="checkbox" disabled />
+        <label for="legAvailable"> Available</label>
+        <input id="legAvailable" type="checkbox" data-status="notavailable" disabled />
+        <label for="legAvailable"> Not Available</label>
+        <input id="legBooked" type="checkbox" data-status="booked" checked disabled />
+        <label for="legBooked"> Booked</label>
+        <input id="legBooked" type="checkbox" checked disabled />
+        <label for="legBooked"> Selected</label>
+    </div>
+
+    <div id="seats">
+
+    </div>
+
+    <div class="methods">
+        <button type="button" id="btnGetSelected">Get Selected</button>
+    </div>
+</body>
+</html>
