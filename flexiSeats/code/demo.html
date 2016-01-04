@@ -12,14 +12,18 @@
             var seats = $('#seats').flexiSeats({
                 rows: 10,
                 columns: 20,
-                multiple: false,
+                multiple: true,
                 notavailable: ['1-2', '4-3'],
                 booked: ['2-3']
             });
 
             $('#btnGetSelected').click(function () {
                 seats.getSelected();
-            });            
+            });
+
+            $('.flexiSeatsMode').click(function () {
+                seats.setMultiple($(this).val());
+            });
         });
     </script>
     
@@ -39,6 +43,13 @@
 
     <div id="seats">
 
+    </div>
+
+    <div>
+        <br />
+        <h4>Mode</h4>
+        <input type="radio" name="mode" value="false" class="flexiSeatsMode" />Single
+        <input type="radio" name="mode" value="true" class="flexiSeatsMode" />Multiple
     </div>
 
     <div class="methods">

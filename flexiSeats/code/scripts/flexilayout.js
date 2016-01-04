@@ -1,4 +1,8 @@
-﻿(function ($) {
+﻿/* flexiSeats: jQuery plugin to create flexible and interactive seating layouts */
+/* Author: Pratik Galoria */
+/* Version 1.0 */
+
+(function ($) {
     $.fn.flexiSeats = function (options) {
         var scope = this;
 
@@ -59,7 +63,7 @@
 
             var _id = $(this).prop('id').substr(4);
 
-            if (settings.multiple) {                
+            if (settings.multiple === true) {
                 if (_multiCursor == 0) {
                     _multiCursor = 1;
                     _multiStart = _id;
@@ -83,7 +87,8 @@
 
         //Private Functions
         function selectSeat(id) {
-            _selected.push(id);
+            if ($.inArray(id, _selected) == -1)
+                _selected.push(id);
         }
 
         function deselectSeat(id) {
@@ -95,7 +100,20 @@
         function selectMultiple(start, end) {            
             var _i = start.split('-');
             var _j = end.split('-');
-            for (i = parseInt(_i[0]); i <= parseInt(_j[0]); i++) {
+
+            if (parseInt(_i[0]) > parseInt(_j[0])) {
+                var _temp = _i[0];
+                _i[0] = _j[0];
+                _j[0] = _temp;
+            }
+
+            if (parseInt(_i[1]) > parseInt(_j[1])) {
+                var _temp = _i[1];
+                _i[1] = _j[1];
+                _j[1] = _temp;
+            }
+
+            for (i = parseInt(_i[0]) ; i <= parseInt(_j[0]) ; i++) {
                 for (j = parseInt(_i[1]) ; j <= parseInt(_j[1]) ; j++) {
                     if ($('input:checkbox[id="seat' + i + '-' + j + '"]', scope).data('status') != 'notavailable' && $('input:checkbox[id="seat' + i + '-' + j + '"]', scope).data('status') != 'booked') {
                         $('input:checkbox[id="seat' + i + '-' + j + '"]', scope).prop('checked', 'checked');
@@ -120,7 +138,8 @@
                 alert(_selected);
             },
             setMultiple: function (value) {
-                settings.multiple = value;
+                _multiCursor = 0;
+                settings.multiple = value === 'true';
             }
         }
     };
