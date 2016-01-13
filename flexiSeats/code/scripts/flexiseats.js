@@ -25,15 +25,27 @@
         var _multiStart = '';
         var _multiEnd = '';
 
+        //Clearing the current layout
+        this.empty();
+
+        var _rowLabel = $('<div class="row"><span class="row-label"></span></div>');
+        for (c = 0; c < settings.columns; c++) {
+            _rowLabel.append('<span class="col-label">' + c + '</span>');
+        }
+        this.append(_rowLabel);
 
         //Create Initial Layout
-        for (i = 0; i < settings.rows; i++) {
+        for (i = 0; i < settings.rows; i++) {            
+
             var _row = $('<div class="row"></div>');
+            var _colLabel = $('<span class="row-label">' + i + '</span>');
+            _row.append(_colLabel);
+
             for (j = 0; j < settings.columns; j++) {
                 var _id = i + '-' + j;
-
+                
                 var _checkbox = $('<input id="seat' + _id + '" type="checkbox" />');
-                var _label = $('<label for="seat' + _id + '"></label>');
+                var _seat = $('<label for="seat' + _id + '"></label>');
 
                 if ($.inArray(_id, settings.booked) >= 0) {
                     _checkbox.prop('disabled', 'disabled');
@@ -51,8 +63,9 @@
                 }
 
                 _row.append(_checkbox);
-                _row.append(_label);
+                _row.append(_seat);
             }
+
             this.append(_row);
         }
 

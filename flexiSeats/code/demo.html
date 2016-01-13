@@ -2,19 +2,26 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>flexiSeats</title>
-    <link href="styles/flexilayout.css" rel="stylesheet" />
+    <link href="styles/flexiseats.css" rel="stylesheet" />
     <link href="styles/font-awesome.min.css" rel="stylesheet" />
     <script src="scripts/jquery-2.1.4.min.js"></script>
-    <script src="scripts/flexilayout.js"></script>
+    <script src="scripts/flexiseats.js"></script>
 
     <script type="text/javascript">
-        $(document).ready(function () {            
+        $(document).ready(function () {
+
             var seats = $('#seats').flexiSeats({
-                rows: 10,
-                columns: 20,
-                multiple: true,
-                notavailable: ['1-2', '4-3'],
-                booked: ['2-3']
+                rows: 20,
+                columns: 50,
+                multiple: true
+            });
+
+            $('#btnDraw').click(function () {
+
+                var _rows = parseInt($('#txtRows').val());
+                var _cols = parseInt($('#txtCols').val());
+
+                
             });
 
             $('#btnGetSelected').click(function () {
@@ -24,11 +31,17 @@
             $('.flexiSeatsMode').click(function () {
                 seats.setMultiple($(this).val());
             });
+
         });
     </script>
     
 </head>
 <body>
+    <div>
+        Rows: <input id="txtRows" type="text" />
+        Columns: <input id="txtCols" type="text" />
+        <input type="button" id="btnDraw" value="Draw" />
+    </div>
 
     <div class="legends">
         <input id="legAvailable" type="checkbox" disabled />
