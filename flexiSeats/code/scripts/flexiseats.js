@@ -16,6 +16,8 @@
         }, options);
 
         //Local Variables
+        var _seats = [];
+
         var _available = [];
         var _notavailable = [];
         var _booked = [];
@@ -25,49 +27,20 @@
         var _multiStart = '';
         var _multiEnd = '';
 
-        //Clearing the current layout
-        this.empty();
-
-        var _rowLabel = $('<div class="row"><span class="row-label"></span></div>');
-        for (c = 0; c < settings.columns; c++) {
-            _rowLabel.append('<span class="col-label">' + c + '</span>');
+        //Objects
+        seat = function () { };
+        seat.prototype = {
+            id: null,
+            price: null,
+            booked: false,
+            available: true,
+            notavailable: false,
+            selected: false
         }
-        this.append(_rowLabel);
+        
 
-        //Create Initial Layout
-        for (i = 0; i < settings.rows; i++) {            
-
-            var _row = $('<div class="row"></div>');
-            var _colLabel = $('<span class="row-label">' + i + '</span>');
-            _row.append(_colLabel);
-
-            for (j = 0; j < settings.columns; j++) {
-                var _id = i + '-' + j;
-                
-                var _checkbox = $('<input id="seat' + _id + '" type="checkbox" />');
-                var _seat = $('<label for="seat' + _id + '"></label>');
-
-                if ($.inArray(_id, settings.booked) >= 0) {
-                    _checkbox.prop('disabled', 'disabled');
-                    _checkbox.attr('data-status', 'booked');
-                    _booked.push(_id);
-                }
-                else if ($.inArray(_id, settings.notavailable)>=0){
-                    _checkbox.prop('disabled', 'disabled');
-                    _checkbox.attr('data-status', 'notavailable');
-                    _notavailable.push(_id);
-                }
-                else
-                {
-                    _available.push(_id);
-                }
-
-                _row.append(_checkbox);
-                _row.append(_seat);
-            }
-
-            this.append(_row);
-        }
+        //Initialize
+        draw(this);
 
         //Events
         this.on('click', 'input:checkbox', function () {
@@ -80,6 +53,7 @@
                 if (_multiCursor == 0) {
                     _multiCursor = 1;
                     _multiStart = _id;
+                    selectSeat(_id);
                 }
                 else {
                     _multiCursor = 0;
@@ -96,18 +70,84 @@
                     deselectSeat(_id);
                 }
             }
-        });
+        });        
 
         //Private Functions
+        function draw(container) {
+            //Clearing the current layout
+            container.empty();
+
+            //Providing Column labels
+            var _rowLabel = $('<div class="row"><span class="row-label"></span></div>');
+            for (c = 0; c < settings.columns; c++) {
+                _rowLabel.append('<span class="col-label">' + c + '</span>');
+            }
+
+            container.append(_rowLabel);
+
+            //Create Initial Layout
+            for (i = 0; i < settings.rows; i++) {
+
+                //Providing Row label
+                var _row = $('<div class="row"></div>');
+                var _colLabel = $('<span class="row-label">' + String.fromCharCode(65+i) + '</span>');
+                _row.append(_colLabel);
+
+                for (j = 0; j < settings.columns; j++) {
+                    var _id = i + '-' + j;
+
+                    //Creating new Seat object
+                    var _seatObject = new seat();
+                    _seatObject.id = _id;
+                    _seatObject.price = 2;                    
+
+                    var _checkbox = $('<input id="seat' + _id + '" type="checkbox" />');
+                    var _seat = $('<label class="seat" for="seat' + _id + '" title="<h5>#'+String.fromCharCode(65+i)+'-'+j+'</h5><h6>$2.00</h6>"></label>');
+
+                    if ($.inArray(_id, settings.booked) >= 0) {
+                        _checkbox.prop('disabled', 'disabled');
+                        _checkbox.attr('data-status', 'booked');
+                        _seatObject.booked = true;
+                        _booked.push(_id);
+                    }
+                    else if ($.inArray(_id, settings.notavailable) >= 0) {
+                        _checkbox.prop('disabled', 'disabled');
+                        _checkbox.attr('data-status', 'notavailable');
+                        _seatObject.available = false;
+                        _seatObject.notavailable = true;
+                        _notavailable.push(_id);
+                    }
+                    else {
+                        _available.push(_id);
+                    }
+
+                    _row.append(_checkbox);
+                    _row.append(_seat);
+
+                    _seats.push(_seatObject);
+                }
+                container.append(_row);
+            }
+        }
+
         function selectSeat(id) {
-            if ($.inArray(id, _selected) == -1)
-                _selected.push(id);
+            if ($.inArray(id, _selected) == -1) {
+                _selected.push(id);                
+                var _seatObj = _seats.filter(function (seat) {
+                    return seat.id == id;
+                });
+                _seatObj[0].selected = true;
+            }
         }
 
         function deselectSeat(id) {
             _selected = $.grep(_selected, function (item) {
-                return item !== _id;
+                return item !== id;
             });
+            var _seatObj = _seats.filter(function (seat) {
+                return seat.id == id;
+            });
+            _seatObj[0].selected = false;
         }
 
         function selectMultiple(start, end) {            
@@ -136,19 +176,27 @@
             }
         }
 
-        //Methods
+        //API
         return {            
-            getAvailable: function(){
-                return _available;
+            getAvailable: function () {
+                return _seats.filter(function (seat) {
+                    return seat.available == true;
+                });
             },
             getNotAvailable: function () {
-                return _notavailable;
+                return _seats.filter(function (seat) {
+                    return seat.notavailable == true;
+                });
             },
             getBooked: function () {
-                return _booked;
+                return _seats.filter(function (seat) {
+                    return seat.booked == true;
+                });
             },
             getSelected: function () {
-                alert(_selected);
+                return _seats.filter(function (seat) {
+                    return seat.selected == true;
+                });
             },
             setMultiple: function (value) {
                 _multiCursor = 0;

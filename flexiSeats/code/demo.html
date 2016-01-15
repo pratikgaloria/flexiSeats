@@ -3,35 +3,46 @@
 <head>
     <title>flexiSeats</title>
     <link href="styles/flexiseats.css" rel="stylesheet" />
+    <link href="styles/tooltipster.css" rel="stylesheet" />
+    <link href="styles/tooltipster-shadow.css" rel="stylesheet" />
     <link href="styles/font-awesome.min.css" rel="stylesheet" />
+    
     <script src="scripts/jquery-2.1.4.min.js"></script>
     <script src="scripts/flexiseats.js"></script>
+    <script src="scripts/jquery.tooltipster.min.js"></script>
 
     <script type="text/javascript">
         $(document).ready(function () {
 
             var seats = $('#seats').flexiSeats({
-                rows: 20,
-                columns: 50,
-                multiple: true
+                rows: 10,
+                columns: 20,
+                multiple: true,
+                booked: ['1-2', '4-7']
             });
 
             $('#btnDraw').click(function () {
-
                 var _rows = parseInt($('#txtRows').val());
-                var _cols = parseInt($('#txtCols').val());
-
-                
+                var _cols = parseInt($('#txtCols').val());                
             });
 
             $('#btnGetSelected').click(function () {
-                seats.getSelected();
+                alert(seats.getSelected().length);
             });
 
             $('.flexiSeatsMode').click(function () {
                 seats.setMultiple($(this).val());
             });
 
+            $('.seat').hover(function () {
+                $(this).addClass('hover');
+            });
+            
+            $('.seat').tooltipster({
+                offsetY: -10,
+                theme: 'tooltipster-shadow',
+                contentAsHTML: true
+            });
         });
     </script>
     
