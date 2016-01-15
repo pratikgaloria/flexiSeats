@@ -16,11 +16,10 @@
         }, options);
 
         //Local Variables
+        var _blocks = [];
         var _seats = [];
 
         var _available = [];
-        var _notavailable = [];
-        var _booked = [];
         var _selected = [];
         
         var _multiCursor = 0;
@@ -28,16 +27,34 @@
         var _multiEnd = '';
 
         //Objects
+        block = function () { };
+        block.prototype = {
+            id: null,
+            price: null,
+            color: null
+        }
+
+        _blockP = new block();
+        _blockP.id = 1;
+        _blockP.price = 200;
+        _blockP.color = '#c0392b';
+        _blocks.push(_blockP);
+
+        _blockG = new block();
+        _blockG.id = 2;
+        _blockG.price = 150;
+        _blockG.color = '#16a085';
+        _blocks.push(_blockG);
+
         seat = function () { };
         seat.prototype = {
             id: null,
-            price: null,
+            blockid: null,
             booked: false,
             available: true,
             notavailable: false,
             selected: false
-        }
-        
+        }        
 
         //Initialize
         draw(this);
@@ -73,6 +90,8 @@
         });        
 
         //Private Functions
+
+        //Draw layout
         function draw(container) {
             //Clearing the current layout
             container.empty();
@@ -102,23 +121,27 @@
                     _seatObject.price = 2;                    
 
                     var _checkbox = $('<input id="seat' + _id + '" type="checkbox" />');
-                    var _seat = $('<label class="seat" for="seat' + _id + '" title="<h5>#'+String.fromCharCode(65+i)+'-'+j+'</h5><h6>$2.00</h6>"></label>');
+
+                    var _seatClass = 'seat';
+                    /*var _seatBlockColor = _blockP.color;
+                    if (i < 5)
+                        _seatBlockColor = _blockG.color;
+                        */
+                    var _seat = $('<label class="'+_seatClass+'" for="seat' + _id + '"  title="<h5>#'+String.fromCharCode(65+i)+'-'+j+'</h5><h6>$2.00</h6>"></label>');
 
                     if ($.inArray(_id, settings.booked) >= 0) {
                         _checkbox.prop('disabled', 'disabled');
                         _checkbox.attr('data-status', 'booked');
                         _seatObject.booked = true;
-                        _booked.push(_id);
                     }
                     else if ($.inArray(_id, settings.notavailable) >= 0) {
                         _checkbox.prop('disabled', 'disabled');
                         _checkbox.attr('data-status', 'notavailable');
                         _seatObject.available = false;
                         _seatObject.notavailable = true;
-                        _notavailable.push(_id);
                     }
                     else {
-                        _available.push(_id);
+
                     }
 
                     _row.append(_checkbox);
@@ -130,6 +153,7 @@
             }
         }
 
+        //Select a single seat
         function selectSeat(id) {
             if ($.inArray(id, _selected) == -1) {
                 _selected.push(id);                
@@ -140,6 +164,7 @@
             }
         }
 
+        //Deselect a single seat
         function deselectSeat(id) {
             _selected = $.grep(_selected, function (item) {
                 return item !== id;
@@ -150,6 +175,7 @@
             _seatObj[0].selected = false;
         }
 
+        //Select multiple seats
         function selectMultiple(start, end) {            
             var _i = start.split('-');
             var _j = end.split('-');
