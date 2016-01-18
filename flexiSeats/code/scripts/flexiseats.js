@@ -29,27 +29,21 @@
         //Objects
         block = function () { };
         block.prototype = {
-            id: null,
+            label: null,
             price: null,
             color: null
         }
 
-        _blockP = new block();
-        _blockP.id = 1;
-        _blockP.price = 200;
-        _blockP.color = '#c0392b';
-        _blocks.push(_blockP);
-
-        _blockG = new block();
-        _blockG.id = 2;
-        _blockG.price = 150;
-        _blockG.color = '#16a085';
-        _blocks.push(_blockG);
+        var _defaultBlock = new block();
+        _defaultBlock.label = 'Default';
+        _defaultBlock.price = 1;
+        _defaultBlock.color = '#fff';
+        _blocks.push(_defaultBlock);
 
         seat = function () { };
         seat.prototype = {
             id: null,
-            blockid: null,
+            block: null,
             booked: false,
             available: true,
             notavailable: false,
@@ -57,7 +51,9 @@
         }        
 
         //Initialize
-        draw(this);
+        var _container = this;
+        init();
+        draw(_container);
 
         //Events
         this.on('click', 'input:checkbox', function () {
@@ -91,6 +87,38 @@
 
         //Private Functions
 
+        //Initialize
+        function init(){
+            for (i = 0; i < settings.rows; i++) {   
+                for (j = 0; j < settings.columns; j++) {
+                    
+                    //Defining ID
+                    var _id = i + '-' + j;
+                    
+                    //Creating new seat object and providing ID
+                    var _seatObject = new seat();
+                    _seatObject.id = _id;                  
+
+                    //Check if seat is already in booked status
+                    if ($.inArray(_id, settings.booked) >= 0) {
+                        _seatObject.booked = true;
+                    }
+
+                    //Check if seat is available for booking
+                    else if ($.inArray(_id, settings.notavailable) >= 0) {
+                        _seatObject.available = false;
+                        _seatObject.notavailable = true;
+                    }
+
+                    //Other conditions
+                    else {
+                    }
+
+                    _seats.push(_seatObject);
+                }
+            }
+        }
+
         //Draw layout
         function draw(container) {
             //Clearing the current layout
@@ -103,8 +131,8 @@
             }
 
             container.append(_rowLabel);
-
-            //Create Initial Layout
+            
+            //Creating Initial Layout
             for (i = 0; i < settings.rows; i++) {
 
                 //Providing Row label
@@ -115,30 +143,27 @@
                 for (j = 0; j < settings.columns; j++) {
                     var _id = i + '-' + j;
 
-                    //Creating new Seat object
-                    var _seatObject = new seat();
-                    _seatObject.id = _id;
-                    _seatObject.price = 2;                    
+                    //Finding the seat from the array
+                    var _seatObject = _seats.filter(function(seat){
+                        return seat.id == _id;
+                    })[0];                  
 
-                    var _checkbox = $('<input id="seat' + _id + '" type="checkbox" />');
+                    var _checkbox = $('<input id="seat' + _seatObject.id + '" type="checkbox" />');
 
                     var _seatClass = 'seat';
-                    /*var _seatBlockColor = _blockP.color;
-                    if (i < 5)
-                        _seatBlockColor = _blockG.color;
-                        */
-                    var _seat = $('<label class="'+_seatClass+'" for="seat' + _id + '"  title="<h5>#'+String.fromCharCode(65+i)+'-'+j+'</h5><h6>$2.00</h6>"></label>');
+                    var _seatBlockColor = '#fff';
+                    if(_seatObject.block!=null)                    
+                        _seatBlockColor = _blocks.filter(function (block) { return block.label == _seatObject.block })[0].color;
+                    
+                    var _seat = $('<label class="' + _seatClass + '" for="seat' + _seatObject.id + '" style="background-color: ' + _seatBlockColor + '"  title="<h5>#' + String.fromCharCode(65 + i) + '-' + j + '</h5><h6>$2.00</h6>"></label>');
 
-                    if ($.inArray(_id, settings.booked) >= 0) {
+                    if (_seatObject.booked) {
                         _checkbox.prop('disabled', 'disabled');
                         _checkbox.attr('data-status', 'booked');
-                        _seatObject.booked = true;
                     }
-                    else if ($.inArray(_id, settings.notavailable) >= 0) {
+                    else if (_seatObject.notavailable) {
                         _checkbox.prop('disabled', 'disabled');
                         _checkbox.attr('data-status', 'notavailable');
-                        _seatObject.available = false;
-                        _seatObject.notavailable = true;
                     }
                     else {
 
@@ -146,8 +171,6 @@
 
                     _row.append(_checkbox);
                     _row.append(_seat);
-
-                    _seats.push(_seatObject);
                 }
                 container.append(_row);
             }
@@ -203,7 +226,10 @@
         }
 
         //API
-        return {            
+        return {
+            draw: function () {
+                draw(_container);
+            },
             getAvailable: function () {
                 return _seats.filter(function (seat) {
                     return seat.available == true;
@@ -227,6 +253,28 @@
             setMultiple: function (value) {
                 _multiCursor = 0;
                 settings.multiple = value === 'true';
+            },
+            addBlock: function (label, price, color) {
+                var _newBlock = new block();
+                _newBlock.label = label;
+                _newBlock.price = price;
+                _newBlock.color = color;
+                _blocks.push(_newBlock);
+            },
+            removeBlock: function (label) {
+                _blocks = $.grep(_blocks, function (item) {
+                    return item.label !== label;
+                });
+            },
+            defineBlock: function (label, seats) {
+                $.each(seats, function (i, v) {
+                    var _this = this;
+                    var _seat = _seats.filter(function (seat) {
+                        return seat.id == _this.id;
+                    });                    
+                    _seat[0].block = label;
+                });
+                draw(_container);
             }
         }
     };

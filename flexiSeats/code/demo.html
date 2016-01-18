@@ -26,6 +26,8 @@
                 var _cols = parseInt($('#txtCols').val());                
             });
 
+            seats.addBlock('Gold', '200', '#ffc');            
+
             $('#btnGetSelected').click(function () {
                 alert(seats.getBooked().length);
             });
@@ -34,8 +36,8 @@
                 seats.setMultiple($(this).val());
             });
 
-            $('.seat').hover(function () {
-                $(this).addClass('hover');
+            $('#btnDefineGold').click(function () {
+                seats.defineBlock('Gold', seats.getSelected());
             });
             
             $('.seat').tooltipster({
@@ -78,6 +80,7 @@
 
     <div class="methods">
         <button type="button" id="btnGetSelected">Get Selected</button>
+        <button type="button" id="btnDefineGold">Define Gold</button>
     </div>
 </body>
 </html>
