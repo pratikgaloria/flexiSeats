@@ -34,12 +34,6 @@
             color: null
         }
 
-        var _defaultBlock = new block();
-        _defaultBlock.label = 'Default';
-        _defaultBlock.price = 1;
-        _defaultBlock.color = '#fff';
-        _blocks.push(_defaultBlock);
-
         seat = function () { };
         seat.prototype = {
             id: null,
@@ -148,14 +142,22 @@
                         return seat.id == _id;
                     })[0];                  
 
-                    var _checkbox = $('<input id="seat' + _seatObject.id + '" type="checkbox" />');
+                    
 
                     var _seatClass = 'seat';
                     var _seatBlockColor = '#fff';
-                    if(_seatObject.block!=null)                    
+                    var _price = 0;
+
+                    if (_seatObject.block != null) {
                         _seatBlockColor = _blocks.filter(function (block) { return block.label == _seatObject.block })[0].color;
-                    
-                    var _seat = $('<label class="' + _seatClass + '" for="seat' + _seatObject.id + '" style="background-color: ' + _seatBlockColor + '"  title="<h5>#' + String.fromCharCode(65 + i) + '-' + j + '</h5><h6>$2.00</h6>"></label>');
+                        var _block = _blocks.filter(function (block) {
+                            return block.label == _seatObject.block;
+                        });
+                        _price = _block[0].price;
+                    }
+
+                    var _checkbox = $('<input id="seat' + _seatObject.id + '" data-block="' + _seatObject.block + '" type="checkbox" />');
+                    var _seat = $('<label class="' + _seatClass + '" for="seat' + _seatObject.id + '" style="background-color: ' + _seatBlockColor + '"  title="#' + String.fromCharCode(65 + i) + '-' + j + ', ' + _price + ' Rs."></label>');
 
                     if (_seatObject.booked) {
                         _checkbox.prop('disabled', 'disabled');
@@ -254,6 +256,9 @@
                 _multiCursor = 0;
                 settings.multiple = value === 'true';
             },
+            getBlocks: function(){
+                return _blocks;
+            },
             addBlock: function (label, price, color) {
                 var _newBlock = new block();
                 _newBlock.label = label;
@@ -268,12 +273,13 @@
             },
             defineBlock: function (label, seats) {
                 $.each(seats, function (i, v) {
-                    var _this = this;
+                    var _this = this;                    
                     var _seat = _seats.filter(function (seat) {
                         return seat.id == _this.id;
                     });                    
                     _seat[0].block = label;
-                });
+                    _seat[0].selected = false;
+                });                
                 draw(_container);
             }
         }

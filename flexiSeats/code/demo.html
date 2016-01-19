@@ -15,35 +15,48 @@
         $(document).ready(function () {
 
             var seats = $('#seats').flexiSeats({
-                rows: 10,
-                columns: 20,
+                rows: 20,
+                columns: 50,
                 multiple: true,
                 booked: ['1-2', '4-7']
             });
+
+            getBlocks();
 
             $('#btnDraw').click(function () {
                 var _rows = parseInt($('#txtRows').val());
                 var _cols = parseInt($('#txtCols').val());                
             });
 
-            seats.addBlock('Gold', '200', '#ffc');            
+            $('#btnAddBlock').click(function () {
+                var _label = $('#txtBlockLabel').val();
+                var _price = $('#txtBlockPrice').val();
+                var _color = $('#txtBlockColor').val();
 
-            $('#btnGetSelected').click(function () {
-                alert(seats.getBooked().length);
+                seats.addBlock(_label, _price, _color);
+                getBlocks();
             });
+            
+            function getBlocks() {
+                $('#lstBlocks').empty();
+                $.each(seats.getBlocks(), function (i, v) {
+                    var _block = $('<option value="' + this.label + '">' + this.label + ' (' + this.price + ' Rs.)</option>');
+                    $('#lstBlocks').append(_block);
+                });
+            }
 
             $('.flexiSeatsMode').click(function () {
                 seats.setMultiple($(this).val());
             });
 
             $('#btnDefineGold').click(function () {
-                seats.defineBlock('Gold', seats.getSelected());
+                var _label = $('#lstBlocks').val();                
+                seats.defineBlock(_label, seats.getSelected());
             });
             
             $('.seat').tooltipster({
                 offsetY: -10,
-                theme: 'tooltipster-shadow',
-                contentAsHTML: true
+                theme: 'tooltipster-shadow'
             });
         });
     </script>
@@ -78,9 +91,22 @@
         <input type="radio" name="mode" value="true" class="flexiSeatsMode" />Multiple
     </div>
 
-    <div class="methods">
-        <button type="button" id="btnGetSelected">Get Selected</button>
-        <button type="button" id="btnDefineGold">Define Gold</button>
+    <div class="methods">        
+        <select id="lstBlocks"></select>
+        <button type="button" id="btnDefineGold">Define Selected</button>
     </div>
+
+    <h6>Add Block</h6>
+    <table>
+        <tr>
+            <td>Label</td>
+            <td><input type="text" id="txtBlockLabel" /></td>
+            <td>Price</td>
+            <td><input type="text" id="txtBlockPrice" /></td>
+            <td>Color</td>
+            <td><input type="text" id="txtBlockColor" /></td>
+        </tr>
+    </table>
+    <button type="button" id="btnAddBlock">Add</button>
 </body>
 </html>
